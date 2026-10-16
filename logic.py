@@ -66,6 +66,10 @@ def add_event(name, start_date, end_date, zoo_place_id, ticket_id):
 
 def add_employee(zoo_id, name, surname, has_vacation, vacation_id):
     con, cur = connect_to_db()
+    if has_vacation.lower() == 'yes':
+        has_vacation = True
+    elif has_vacation.lower() == 'no':
+        has_vacation = False
     cur.execute('''INSERT INTO employee (zoo_id, name, surname, has_vacation, vacation_id) VALUES (?, ?, ?, ?, ?)''', (zoo_id, name, surname, has_vacation, vacation_id))
     con.commit()
     con.close()

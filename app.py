@@ -450,7 +450,7 @@ surname_emp_input.pack(pady=5)
 result = tk.Label(employee_block, text="")
 result.pack(pady=5)
 
-tk.Label(employee_block, text="Has Vacation").pack()
+tk.Label(employee_block, text="Has Vacation(Yes/No)").pack()
 has_vacation_input = tk.Entry(employee_block, width=40)
 has_vacation_input.pack(pady=5)
 
