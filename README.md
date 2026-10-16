@@ -1,10 +1,11 @@
 # project_database
-<img width="1247" height="741" alt="image" src="https://github.com/user-attachments/assets/25ef3903-92da-47e3-93b4-ac1e313b4f4c" />
+<img width="1247" height="741" alt="image" src="https://github.com/user-attachments/assets/429fa0e8-ee6d-4671-95a1-b1c70910ed72" />
+
 
 Vajadzības - zoodarza kataloga veidošana strādniekiem
 Lietotāji - zoodarza dārbnieki
 
-Protatipu funkcijas:
+Prototipu funkcijas:
 informāciju pievienošana un labošana, un noņemšana
 
 IZMAIŅAS
