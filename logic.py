@@ -13,6 +13,11 @@ def connect_to_db():
 
 def add_zoo(name, open):
     con, cur = connect_to_db()
+
+    if open.lower() == 'open':
+        open = True
+    elif open.lower() == 'closed':
+        open = False
     cur.execute('''INSERT INTO zoo (name, open) VALUES (?, ?)''', (name, open))
     con.commit()
     con.close()
