@@ -114,7 +114,6 @@ def addvacationFromvlog():
     TABLE_REFRESH["vacation"]()
 
 def make_search_table(tab, title, headers, search_func, update_func, delete_func, refresh_key):
-    """Uztaisa meklēšanas lauku, tabulu un pogas. update_func(form, tree) atjaunina ierakstu, delete_func(id) dzēš."""
     tk.Label(tab, text=title, font=("Arial", 12, "bold")).pack(pady=5)
     search_entry = tk.Entry(tab, width=40, font=("Arial", 11))
     search_entry.pack(pady=5)
@@ -158,8 +157,17 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
         if record_id is None:
             messagebox.showwarning("Uzmanību", "Vispirms izvēlies rindu tabulā!")
             return
-        values = tree.item(tree.selection()[0], "values")
-        update_func(record_id, *values[1:])
+        widgets = form_widgets["entries"]
+        if not widgets:
+            messagebox.showwarning("Uzmanību", "Forma šai tabulai nav piesaistīta!")
+            return
+        values = [w.get() for w in widgets]
+        if any(v == "" for v in values):
+            messagebox.showwarning("Uzmanību", "Nospied 'Ielādēt formā', izmaini datus un tad nospied 'Atjaunināt'!")
+            return
+        update_func(record_id, *values)
+        for w in widgets:
+            w.delete(0, tk.END)
         refresh()
 
     def delete_record():
