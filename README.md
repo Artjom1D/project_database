@@ -13,3 +13,7 @@ has_free BLOB -> has_vacation BOOLEAN
 free_id -> vacation_id
 table name "free" -> table now called "vacation" 
 table "vacation" has no more row "name"
+
+
+Lai palaistu projektu ir jāpalaist app.py 👍
+
