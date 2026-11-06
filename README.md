@@ -17,3 +17,8 @@ table "vacation" has no more row "name"
 
 Lai palaistu projektu ir jāpalaist app.py 👍
 
+
+
+Piedavājums:
+
+Pieveinot noformējumu
