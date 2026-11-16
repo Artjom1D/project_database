@@ -104,11 +104,9 @@ def addemployeeFromvlog():
     TABLE_REFRESH["employee"]()
 
 def addvacationFromvlog():
-    emp_id = emp_id_input.get()
     start_date_v = start_date_v_input.get()
     end_date_v = end_date_v_input.get()
-    add_vacation(emp_id, start_date_v, end_date_v)
-    emp_id_input.delete(0, tk.END)
+    add_vacation(start_date_v, end_date_v)
     start_date_v_input.delete(0, tk.END)
     end_date_v_input.delete(0, tk.END)
     TABLE_REFRESH["vacation"]()
@@ -146,7 +144,7 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
             messagebox.showwarning("Uzmanību", "Vispirms izvēlies rindu tabulā!")
             return
         values = tree.item(tree.selection()[0], "values")
-        # ievieto rindas datus formā (bez pirmās kolonnas - ID)
+
         widgets = form_widgets["entries"]
         for widget, value in zip(widgets, values[1:]):
             widget.delete(0, tk.END)
@@ -318,21 +316,21 @@ location_block = tk.LabelFrame(
 )
 
 location_block.pack(padx=10, pady=10, fill="x")
-tk.Label(location_block, text="Pet Name").pack()
+tk.Label(location_block, text="Pet ID").pack()
 pet_id_g_input = tk.Entry(location_block, width=40)
 pet_id_g_input.pack(pady=5)
 
 result = tk.Label(location_block, text="")
 result.pack(pady=5)
 
-tk.Label(location_block, text="Zoo Name").pack()
+tk.Label(location_block, text="Zoo ID").pack()
 zoo_id_g_input = tk.Entry(location_block, width=40)
 zoo_id_g_input.pack(pady=5)
 
 result = tk.Label(location_block, text="")
 result.pack(pady=5)
 
-tk.Label(location_block, text="Ticket Name").pack()
+tk.Label(location_block, text="Ticket ID").pack()
 ticket_id_g_input = tk.Entry(location_block, width=40)
 ticket_id_g_input.pack(pady=5)
 result = tk.Label(location_block, text="")
@@ -360,7 +358,7 @@ petgroup_block = tk.LabelFrame(
     pady=10
 )
 petgroup_block.pack(padx=10, pady=10, fill="x")
-tk.Label(petgroup_block, text="PetD").pack()
+tk.Label(petgroup_block, text="Pet ID").pack()
 pet_id_input = tk.Entry(petgroup_block, width=40)
 pet_id_input.pack(pady=5)
 
@@ -484,7 +482,7 @@ veterinary_block = tk.LabelFrame(
 )
 veterinary_block.pack(padx=10, pady=10, fill="x")
 
-tk.Label(veterinary_block, text="Pet Name").pack()
+tk.Label(veterinary_block, text="Pet ID").pack()
 pet_id_rec_input = tk.Entry(veterinary_block, width=40)
 pet_id_rec_input.pack(pady=5)
 
@@ -589,14 +587,14 @@ end_date_e_input.pack(pady=5)
 result = tk.Label(event_block, text="")
 result.pack(pady=5)
 
-tk.Label(event_block, text="Zoo place Name").pack()
+tk.Label(event_block, text="Zoo place ID").pack()
 zoo_place_id_input = tk.Entry(event_block, width=40)
 zoo_place_id_input.pack(pady=5)
 
 result = tk.Label(event_block, text="")
 result.pack(pady=5)
 
-tk.Label(event_block, text="Ticket Name").pack()
+tk.Label(event_block, text="Ticket ID").pack()
 ticket_id_e_input = tk.Entry(event_block, width=40)
 ticket_id_e_input.pack(pady=5)
 
@@ -651,7 +649,7 @@ has_vacation_input.pack(pady=5)
 result = tk.Label(employee_block, text="")
 result.pack(pady=5)
 
-tk.Label(employee_block, text="Vacation Name").pack()
+tk.Label(employee_block, text="Vacation").pack()
 vacation_id_input = tk.Entry(employee_block, width=40)
 vacation_id_input.pack(pady=5)
 
@@ -678,10 +676,6 @@ vacation_block = tk.LabelFrame(
     pady=10
 )
 vacation_block.pack(padx=10, pady=10, fill="x")
-tk.Label(vacation_block, text="Employee Name").pack()
-emp_id_input = tk.Entry(vacation_block, width=40)
-emp_id_input.pack(pady=5)
-
 result = tk.Label(vacation_block, text="")
 result.pack(pady=5)
 

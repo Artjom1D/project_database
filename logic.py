@@ -1,5 +1,5 @@
 import sqlite3
-
+import datetime
 def connect_to_db():
     con = sqlite3.connect("data.db")
     cur = con.cursor()
@@ -39,14 +39,16 @@ def add_pet(name, color, feed_id):
     con.close()
 
 def add_food(pr_name, price, available_amount, next_order):
+    next_orders = fix_date(next_order)
     con, cur = connect_to_db()
-    cur.execute('''INSERT INTO food (pr_name, price, available_amount, next_order) VALUES (?, ?, ?, ?)''', (pr_name, price, available_amount, next_order))
+    cur.execute('''INSERT INTO food (pr_name, price, available_amount, next_order) VALUES (?, ?, ?, ?)''', (pr_name, price, available_amount, next_orders))
     con.commit()
     con.close()
 
 def add_veterinary_records(pet_id, diagnosis, doctor_suggestion, last_visit):
+    last_visits = fix_date(last_visit)
     con, cur = connect_to_db()
-    cur.execute('''INSERT INTO veterinary_records (pet_id, diagnosis, doctor_suggestion, last_visit) VALUES (?, ?, ?, ?)''', (pet_id, diagnosis, doctor_suggestion, last_visit))
+    cur.execute('''INSERT INTO veterinary_records (pet_id, diagnosis, doctor_suggestion, last_visit) VALUES (?, ?, ?, ?)''', (pet_id, diagnosis, doctor_suggestion, last_visits))
     con.commit()
     con.close()
 
@@ -57,8 +59,9 @@ def add_tickets(name, price):
     con.close()
 
 def add_event(name, start_date, end_date, zoo_place_id, ticket_id):
+    start_dates, end_dates = fix_date(start_date), fix_date(end_date)
     con, cur = connect_to_db()
-    cur.execute('''INSERT INTO event (name, start_date, end_date, zoo_place_id, ticket_id) VALUES (?, ?, ?, ?, ?)''', (name, start_date, end_date, zoo_place_id, ticket_id))
+    cur.execute('''INSERT INTO event (name, start_date, end_date, zoo_place_id, ticket_id) VALUES (?, ?, ?, ?, ?)''', (name, start_dates, end_dates, zoo_place_id, ticket_id))
     con.commit()
     con.close()
 
@@ -73,8 +76,10 @@ def add_employee(zoo_id, name, surname, has_vacation, vacation_id):
     con.close()
 
 def add_vacation(employee_id, start_date, end_date):
+    start_dates = fix_date(start_date)
+    end_dates = fix_date(end_date)
     con, cur = connect_to_db()
-    cur.execute('''INSERT INTO vacation (employee_id, start_date, end_date) VALUES (?, ?, ?)''', (employee_id, start_date, end_date))
+    cur.execute('''INSERT INTO vacation (employee_id, start_date, end_date) VALUES (?, ?, ?)''', (employee_id, start_dates, end_dates))
     con.commit()
     con.close()
 
@@ -233,8 +238,9 @@ def delete_pet(record_id):
     con.close()
 
 def update_food(record_id, pr_name, price, available_amount, next_order):
+    timess = fix_date(next_order)
     con, cur = connect_to_db()
-    cur.execute('''UPDATE food SET pr_name = ?, price = ?, available_amount = ?, next_order = ? WHERE id = ?''', (pr_name, price, available_amount, next_order, record_id))
+    cur.execute('''UPDATE food SET pr_name = ?, price = ?, available_amount = ?, next_order = ? WHERE id = ?''', (pr_name, price, available_amount, timess, record_id))
     con.commit()
     con.close()
 
@@ -245,9 +251,11 @@ def delete_food(record_id):
     con.close()
 
 def update_veterinary_records(record_id, pet_name, diagnosis, doctor_suggestion, last_visit):
+    timess = fix_date(last_visit)
+    print(timess)
     con, cur = connect_to_db()
     pet_id = _resolve(cur, '''SELECT id FROM pet WHERE name = ?''', pet_name)
-    cur.execute('''UPDATE veterinary_records SET pet_id = ?, diagnosis = ?, doctor_suggestion = ?, last_visit = ? WHERE id = ?''', (pet_id, diagnosis, doctor_suggestion, last_visit, record_id))
+    cur.execute('''UPDATE veterinary_records SET pet_id = ?, diagnosis = ?, doctor_suggestion = ?, last_visit = ? WHERE id = ?''', (pet_id, diagnosis, doctor_suggestion, timess, record_id))
     con.commit()
     con.close()
 
@@ -270,10 +278,11 @@ def delete_tickets(record_id):
     con.close()
 
 def update_events(record_id, name, start_date, end_date, zoo_name, ticket_name):
+    timess_start, timess_end = fix_date(start_date), fix_date(end_date) 
     con, cur = connect_to_db()
     zoo_id = _resolve(cur, '''SELECT id FROM zoo WHERE name = ?''', zoo_name)
     ticket_id = _resolve(cur, '''SELECT id FROM tickets WHERE name = ?''', ticket_name)
-    cur.execute('''UPDATE events SET name = ?, start_date = ?, end_date = ?, zoo_place_id = ?, ticket_id = ? WHERE id = ?''', (name, start_date, end_date, zoo_id, ticket_id, record_id))
+    cur.execute('''UPDATE events SET name = ?, start_date = ?, end_date = ?, zoo_place_id = ?, ticket_id = ? WHERE id = ?''', (name, timess_start, timess_end, zoo_id, ticket_id, record_id))
     con.commit()
     con.close()
 
@@ -301,6 +310,8 @@ def delete_employees(record_id):
     con.close()
 
 def update_vacation(record_id, start_date, end_date):
+    start_date = fix_date(start_date)
+    end_date = fix_date(end_date)
     con, cur = connect_to_db()
     cur.execute('''UPDATE vacation SET start_date = ?, end_date = ? WHERE id = ?''', (start_date, end_date, record_id))
     con.commit()
@@ -311,3 +322,36 @@ def delete_vacation(record_id):
     cur.execute('''DELETE FROM vacation WHERE id = ?''', (record_id,))
     con.commit()
     con.close()
+def fix_date(date_str):
+    date_str = date_str.strip()
+    if "-" in date_str:
+        parts = date_str.split("-")
+    elif "/" in date_str:
+        parts = date_str.split("/")
+    if len(parts) != 3:
+        return None
+    try:
+        day, month, year = int(parts[0]), int(parts[1]), int(parts[2])
+    except ValueError:
+        return None
+    if month > 12:
+        year += (month - 1) // 12
+        month = (month - 1) % 12 + 1
+    try:
+        while True:
+            try:
+                result = datetime.date(year, month, day)
+                break
+            except ValueError:
+                if month == 12:
+                    days_in_month = (datetime.date(year + 1, 1, 1) - datetime.date(year, 12, 1)).days
+                else:
+                    days_in_month = (datetime.date(year, month + 1, 1) - datetime.date(year, month, 1)).days
+                day -= days_in_month
+                month += 1
+                if month > 12:
+                    month = 1
+                    year += 1
+        return result.strftime("%d-%m-%Y")
+    except (OverflowError, ValueError):
+        return None
