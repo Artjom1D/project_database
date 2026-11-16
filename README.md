@@ -1,4 +1,4 @@
-# ZOO_--_---+-_database
+# ZOO database
 
 <img width="1247" height="741" alt="image" src="https://github.com/user-attachments/assets/429fa0e8-ee6d-4671-95a1-b1c70910ed72" />
 
