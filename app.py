@@ -112,6 +112,7 @@ def addvacationFromvlog():
     TABLE_REFRESH["vacation"]()
 
 def make_search_table(tab, title, headers, search_func, update_func, delete_func, refresh_key):
+    # Izveido meklēšanas lauku un tabulu.
     tk.Label(tab, text=title, font=("Arial", 12, "bold")).pack(pady=5)
     search_entry = tk.Entry(tab, width=40, font=("Arial", 11))
     search_entry.pack(pady=5)
@@ -120,6 +121,9 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
     table_frame.pack(pady=5, fill="both", expand=True)
 
     tree = ttk.Treeview(table_frame, columns=[f"c{i}" for i in range(len(headers))], show="headings", height=10)
+    # Iestata pamīšus iekrāsotas rindas.
+    tree.tag_configure("even", background="#ffffff")
+    tree.tag_configure("odd", background="#f0f5ef")
     for i, h in enumerate(headers):
         tree.heading(f"c{i}", text=h)
         tree.column(f"c{i}", width=130, anchor="w")
@@ -129,15 +133,18 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
     scrollbar.pack(side="right", fill="y")
     tree.configure(yscrollcommand=scrollbar.set)
 
+    # Atjauno tabulas ierakstus pēc meklēšanas.
     def refresh(e=None):
         tree.delete(*tree.get_children())
-        for r in search_func(search_entry.get()):
-            tree.insert("", "end", iid=str(r[0]), values=r)
+        for index, row in enumerate(search_func(search_entry.get())):
+            tree.insert("", "end", iid=str(row[0]), values=row, tags=("even" if index % 2 == 0 else "odd",))
 
+    # Atgriež izvēlētā ieraksta ID.
     def selected_id():
         sel = tree.selection()
         return int(sel[0]) if sel else None
 
+    # Ielādē izvēlēto ierakstu formā.
     def fill_form():
         record_id = selected_id()
         if record_id is None:
@@ -150,6 +157,7 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
             widget.delete(0, tk.END)
             widget.insert(0, value)
 
+    # Saglabā formas izmaiņas.
     def update_record():
         record_id = selected_id()
         if record_id is None:
@@ -168,6 +176,7 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
             w.delete(0, tk.END)
         refresh()
 
+    # Dzēš izvēlēto ierakstu pēc apstiprinājuma.
     def delete_record():
         record_id = selected_id()
         if record_id is None:
@@ -179,9 +188,9 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
 
     button_frame = tk.Frame(tab)
     button_frame.pack(pady=5)
-    tk.Button(button_frame, text="Dzēst", width=12, command=delete_record).pack(side="left", padx=5)
-    tk.Button(button_frame, text="Atjaunināt", width=12, command=update_record).pack(side="left", padx=5)
-    tk.Button(button_frame, text="Ielādēt formā", width=14, command=fill_form).pack(side="left", padx=5)
+    ttk.Button(button_frame, text="Dzēst", width=12, command=delete_record).pack(side="left", padx=5)
+    ttk.Button(button_frame, text="Atjaunināt", width=12, command=update_record).pack(side="left", padx=5)
+    ttk.Button(button_frame, text="Ielādēt formā", width=14, command=fill_form).pack(side="left", padx=5)
 
     form_widgets = {"entries": []}
 
@@ -194,76 +203,143 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
 
 
 vlog = tk.Tk()
-vlog.title("Zoo katalogs")
-vlog.geometry("1920x1080")
-vlog.configure(bg="#a0e7af")
+vlog.title("ZOO | Katalogs")
+vlog.geometry("1440x900")
+vlog.minsize(1100, 700)
+vlog.configure(bg="#f3f6f0")
+
+# Vienota krāsu tēma un stili lietotnes logam, formām, pogām un tabulām.
+page_bg = "#f3f6f0"
+surface_bg = "#ffffff"
+text_color = "#26382e"
+muted_color = "#66756b"
+forest_green = "#285943"
+leaf_green = "#3d7955"
+line_color = "#d8e2d9"
+
+vlog.option_add("*Font", ("Segoe UI", 10))
+vlog.option_add("*Frame.Background", page_bg)
+vlog.option_add("*Label.Background", page_bg)
+vlog.option_add("*Label.Foreground", text_color)
+vlog.option_add("*Entry.Background", surface_bg)
+vlog.option_add("*Entry.Foreground", text_color)
+vlog.option_add("*Entry.Relief", "flat")
+vlog.option_add("*Entry.BorderWidth", 1)
+vlog.option_add("*Entry.HighlightThickness", 1)
+vlog.option_add("*Entry.HighlightBackground", line_color)
+vlog.option_add("*Entry.HighlightColor", leaf_green)
+vlog.option_add("*Button.Background", leaf_green)
+vlog.option_add("*Button.Foreground", surface_bg)
+vlog.option_add("*Button.ActiveBackground", forest_green)
+vlog.option_add("*Button.ActiveForeground", surface_bg)
+vlog.option_add("*Button.Relief", "flat")
+vlog.option_add("*Button.BorderWidth", 0)
+vlog.option_add("*Button.Padx", 12)
+vlog.option_add("*Button.Pady", 7)
 
 style = ttk.Style()
 style.theme_use("clam")
 
-style.configure(".", background="#f4f6f8", foreground="#333333", font=("Segoe UI", 10))
-style.configure("TNotebook", background="#f4f6f8", borderwidth=0)
-style.configure("TNotebook.Tab", background="#e2e8f0", foreground="#333333", padding=[15, 10], font=("Segoe UI", 10, "bold"))
+# Pamatstils un cilņu izskats.
+style.configure(".", background=page_bg, foreground=text_color, font=("Segoe UI", 10))
+style.configure("TFrame", background=page_bg)
+style.configure("TNotebook", background=page_bg, borderwidth=0, tabmargins=[10, 10, 10, 0])
+style.configure("TNotebook.Tab", background="#e5ece5", foreground=muted_color, padding=[16, 11], font=("Segoe UI", 10, "bold"))
 style.map("TNotebook.Tab",
-    background=[("selected", "#2b6cb0")],
-    foreground=[("selected", "#ffffff")]
+    background=[("selected", forest_green), ("active", "#d6e4d8")],
+    foreground=[("selected", surface_bg), ("active", text_color)]
 )
 
-style.configure("TLabelframe", background="#ffffff", bordercolor="#cbd5e0", relief="solid", borderwidth=1)
-style.configure("TLabelframe.Label", background="#ffffff", foreground="#2b6cb0", font=("Segoe UI", 14, "bold"))
+# Kartīšu un tabulu izskats.
+style.configure("TLabelframe", background=surface_bg, bordercolor=line_color, relief="solid", borderwidth=1)
+style.configure("TLabelframe.Label", background=surface_bg, foreground=forest_green, font=("Segoe UI", 12, "bold"))
 
 style.configure("Treeview",
-    background="#ffffff",
-    foreground="#333333",
-    rowheight=24,
-    fieldbackground="#ffffff",
+    background=surface_bg,
+    foreground=text_color,
+    rowheight=32,
+    fieldbackground=surface_bg,
     font=("Segoe UI", 10)
 )
 style.configure("Treeview.Heading",
-    background="#2b6cb0",
-    foreground="#ffffff",
+    background=forest_green,
+    foreground=surface_bg,
+    padding=[9, 8],
     font=("Segoe UI", 10, "bold")
 )
 style.map("Treeview",
-    background=[("selected", "#90cdf4")],
-    foreground=[("selected", "#000000")]
+    background=[("selected", "#cfe3d3")],
+    foreground=[("selected", text_color)]
 )
 
+# Pogu izskats.
 style.configure("TButton",
-    background="#3182ce",
-    foreground="#ffffff",
+    background=leaf_green,
+    foreground=surface_bg,
     font=("Segoe UI", 10, "bold"),
-    padding=8,
+    padding=[12, 8],
     relief="flat"
 )
 style.map("TButton",
-    background=[("active", "#2b6cb0")]
+    background=[("active", forest_green)],
+    foreground=[("active", surface_bg)]
 )
 
+# Katrai cilnei izveido ritināmu satura apgabalu ar vertikālu ritjoslu.
+tab_canvases = {}
+
+def create_scrollable_tab(notebook, title):
+    tab_container = ttk.Frame(notebook)
+    canvas = tk.Canvas(tab_container, background=page_bg, highlightthickness=0, borderwidth=0)
+    scrollbar = ttk.Scrollbar(tab_container, orient="vertical", command=canvas.yview)
+    content = ttk.Frame(canvas)
+    content_window = canvas.create_window((0, 0), window=content, anchor="nw")
+
+    content.bind("<Configure>", lambda event: canvas.configure(scrollregion=canvas.bbox("all")))
+    canvas.bind("<Configure>", lambda event: canvas.itemconfigure(content_window, width=event.width))
+    canvas.configure(yscrollcommand=scrollbar.set)
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+
+    notebook.add(tab_container, text=title)
+    tab_canvases[tab_container._w] = canvas
+    return content
+
+# Peles ritenītis ritina pašlaik atvērto cilni.
+def scroll_current_tab(event):
+    canvas = tab_canvases.get(tabs.select())
+    if canvas is None:
+        return
+
+    if getattr(event, "num", None) == 4:
+        direction = -1
+    elif getattr(event, "num", None) == 5:
+        direction = 1
+    else:
+        delta = getattr(event, "delta", 0)
+        direction = -max(1, abs(delta) // 120) if delta > 0 else max(1, abs(delta) // 120)
+
+    canvas.yview_scroll(direction, "units")
+    return "break"
+
 tabs = ttk.Notebook(vlog)
-tabs.pack(fill="both", expand=True)
+tabs.pack(fill="both", expand=True, padx=14, pady=(8, 14))
 
-zoo_tab = ttk.Frame(tabs)
-location_tab = ttk.Frame(tabs)
-petgroup_tab = ttk.Frame(tabs)
-pet_tab = ttk.Frame(tabs)
-food_tab = ttk.Frame(tabs)
-veterinary_tab = ttk.Frame(tabs)
-tickets_tab = ttk.Frame(tabs)
-event_tab = ttk.Frame(tabs)
-employee_tab = ttk.Frame(tabs)
-vacation_tab = ttk.Frame(tabs)
+zoo_tab = create_scrollable_tab(tabs, "Zoo")
+location_tab = create_scrollable_tab(tabs, "Location")
+petgroup_tab = create_scrollable_tab(tabs, "Pet Group")
+pet_tab = create_scrollable_tab(tabs, "Pet")
+food_tab = create_scrollable_tab(tabs, "Food")
+veterinary_tab = create_scrollable_tab(tabs, "Veterinary")
+tickets_tab = create_scrollable_tab(tabs, "Tickets")
+event_tab = create_scrollable_tab(tabs, "Event")
+employee_tab = create_scrollable_tab(tabs, "Employee")
+vacation_tab = create_scrollable_tab(tabs, "Vacation")
 
-tabs.add(zoo_tab, text="Zoo")
-tabs.add(location_tab, text="Location")
-tabs.add(petgroup_tab, text="Pet Group")
-tabs.add(pet_tab, text="Pet")
-tabs.add(food_tab, text="Food")
-tabs.add(veterinary_tab, text="Veterinary")
-tabs.add(tickets_tab, text="Tickets")
-tabs.add(event_tab, text="Event")
-tabs.add(employee_tab, text="Employee")
-tabs.add(vacation_tab, text="Vacation")
+# Piesaista ritināšanu Windows un Linux peles ritenīša notikumiem.
+vlog.bind_all("<MouseWheel>", scroll_current_tab)
+vlog.bind_all("<Button-4>", scroll_current_tab)
+vlog.bind_all("<Button-5>", scroll_current_tab)
 
 label = tk.Label(zoo_tab, text="ZOO", font=("Arial", 24))
 label.pack(pady=10)
