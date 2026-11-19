@@ -113,17 +113,33 @@ def addvacationFromvlog():
 
 def make_search_table(tab, title, headers, search_func, update_func, delete_func, refresh_key):
     # Izveido meklēšanas lauku un tabulu.
-    tk.Label(tab, text=title, font=("Arial", 12, "bold")).pack(pady=5)
-    search_entry = tk.Entry(tab, width=40, font=("Arial", 11))
-    search_entry.pack(pady=5)
+    tk.Label(
+        tab,
+        text=title,
+        font=("Segoe UI", 12, "bold"),
+        fg=forest_green,
+        bg=page_bg
+    ).pack(pady=(14, 5))
+
+    search_frame = tk.Frame(tab, bg=surface_bg, highlightbackground=line_color, highlightthickness=1)
+    search_frame.pack(pady=5)
+    search_entry = tk.Entry(
+        search_frame,
+        width=42,
+        font=("Segoe UI", 11),
+        bg=surface_bg,
+        fg=text_color,
+        relief="flat",
+        insertbackground=forest_green,
+        highlightthickness=0,
+        bd=7
+    )
+    search_entry.pack(padx=4, pady=4)
 
     table_frame = tk.Frame(tab)
     table_frame.pack(pady=5, fill="both", expand=True)
 
     tree = ttk.Treeview(table_frame, columns=[f"c{i}" for i in range(len(headers))], show="headings", height=10)
-    # Iestata pamīšus iekrāsotas rindas.
-    tree.tag_configure("even", background="#ffffff")
-    tree.tag_configure("odd", background="#f0f5ef")
     for i, h in enumerate(headers):
         tree.heading(f"c{i}", text=h)
         tree.column(f"c{i}", width=130, anchor="w")
@@ -137,7 +153,7 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
     def refresh(e=None):
         tree.delete(*tree.get_children())
         for index, row in enumerate(search_func(search_entry.get())):
-            tree.insert("", "end", iid=str(row[0]), values=row, tags=("even" if index % 2 == 0 else "odd",))
+            tree.insert("", "end", iid=str(row[0]), values=row)
 
     # Atgriež izvēlētā ieraksta ID.
     def selected_id():
@@ -188,7 +204,7 @@ def make_search_table(tab, title, headers, search_func, update_func, delete_func
 
     button_frame = tk.Frame(tab)
     button_frame.pack(pady=5)
-    ttk.Button(button_frame, text="Dzēst", width=12, command=delete_record).pack(side="left", padx=5)
+    ttk.Button(button_frame, text="Dzēst", width=12, command=delete_record, style="Danger.TButton").pack(side="left", padx=5)
     ttk.Button(button_frame, text="Atjaunināt", width=12, command=update_record).pack(side="left", padx=5)
     ttk.Button(button_frame, text="Ielādēt formā", width=14, command=fill_form).pack(side="left", padx=5)
 
@@ -206,16 +222,18 @@ vlog = tk.Tk()
 vlog.title("ZOO | Katalogs")
 vlog.geometry("1440x900")
 vlog.minsize(1100, 700)
-vlog.configure(bg="#f3f6f0")
+vlog.configure(bg="#edf3e8")
 
 # Vienota krāsu tēma un stili lietotnes logam, formām, pogām un tabulām.
-page_bg = "#f3f6f0"
-surface_bg = "#ffffff"
-text_color = "#26382e"
-muted_color = "#66756b"
-forest_green = "#285943"
-leaf_green = "#3d7955"
-line_color = "#d8e2d9"
+page_bg = "#edf3e8"
+surface_bg = "#fffdf7"
+text_color = "#24372a"
+muted_color = "#6a776d"
+forest_green = "#244f38"
+leaf_green = "#4f8057"
+sun_yellow = "#e6b85c"
+danger_red = "#a44b43"
+line_color = "#ccd9c6"
 
 vlog.option_add("*Font", ("Segoe UI", 10))
 vlog.option_add("*Frame.Background", page_bg)
@@ -243,10 +261,10 @@ style.theme_use("clam")
 # Pamatstils un cilņu izskats.
 style.configure(".", background=page_bg, foreground=text_color, font=("Segoe UI", 10))
 style.configure("TFrame", background=page_bg)
-style.configure("TNotebook", background=page_bg, borderwidth=0, tabmargins=[10, 10, 10, 0])
-style.configure("TNotebook.Tab", background="#e5ece5", foreground=muted_color, padding=[16, 11], font=("Segoe UI", 10, "bold"))
+style.configure("TNotebook", background=page_bg, borderwidth=0, tabmargins=[8, 10, 8, 0])
+style.configure("TNotebook.Tab", background="#dde8d8", foreground=muted_color, padding=[15, 11], font=("Segoe UI", 10, "bold"))
 style.map("TNotebook.Tab",
-    background=[("selected", forest_green), ("active", "#d6e4d8")],
+    background=[("selected", forest_green), ("active", "#cadbc5")],
     foreground=[("selected", surface_bg), ("active", text_color)]
 )
 
@@ -257,18 +275,18 @@ style.configure("TLabelframe.Label", background=surface_bg, foreground=forest_gr
 style.configure("Treeview",
     background=surface_bg,
     foreground=text_color,
-    rowheight=32,
+    rowheight=34,
     fieldbackground=surface_bg,
     font=("Segoe UI", 10)
 )
 style.configure("Treeview.Heading",
     background=forest_green,
     foreground=surface_bg,
-    padding=[9, 8],
+    padding=[10, 9],
     font=("Segoe UI", 10, "bold")
 )
 style.map("Treeview",
-    background=[("selected", "#cfe3d3")],
+    background=[("selected", "#d4e6c8")],
     foreground=[("selected", text_color)]
 )
 
@@ -281,9 +299,45 @@ style.configure("TButton",
     relief="flat"
 )
 style.map("TButton",
-    background=[("active", forest_green)],
+    background=[("active", "#35694a")],
     foreground=[("active", surface_bg)]
 )
+
+# Brīdinājuma darbībām izmanto mierīgu, bet uzkrītošu sarkanu pogas stilu.
+style.configure(
+    "Danger.TButton",
+    background=danger_red,
+    foreground=surface_bg,
+    font=("Segoe UI", 10, "bold"),
+    padding=[12, 8],
+    relief="flat"
+)
+style.map("Danger.TButton",
+    background=[("active", "#843a34")],
+    foreground=[("active", surface_bg)]
+)
+
+def make_action_button(parent, text, command):
+    # Izveido vienotu darbības pogu ar vienkāršu krāsas maiņu peles notikumos.
+    button = tk.Button(
+        parent,
+        text=text,
+        command=command,
+        bg=leaf_green,
+        fg=surface_bg,
+        activebackground=forest_green,
+        activeforeground=surface_bg,
+        relief="flat",
+        borderwidth=0,
+        cursor="hand2",
+        padx=18,
+        pady=8,
+        font=("Segoe UI", 10, "bold")
+    )
+    button.bind("<Enter>", lambda event: button.configure(bg=sun_yellow))
+    button.bind("<Leave>", lambda event: button.configure(bg=leaf_green))
+    return button
+
 
 # Katrai cilnei izveido ritināmu satura apgabalu ar vertikālu ritjoslu.
 tab_canvases = {}
@@ -325,27 +379,23 @@ def scroll_current_tab(event):
 tabs = ttk.Notebook(vlog)
 tabs.pack(fill="both", expand=True, padx=14, pady=(8, 14))
 
-zoo_tab = create_scrollable_tab(tabs, "Zoo")
-location_tab = create_scrollable_tab(tabs, "Location")
-petgroup_tab = create_scrollable_tab(tabs, "Pet Group")
-pet_tab = create_scrollable_tab(tabs, "Pet")
-food_tab = create_scrollable_tab(tabs, "Food")
-veterinary_tab = create_scrollable_tab(tabs, "Veterinary")
-tickets_tab = create_scrollable_tab(tabs, "Tickets")
-event_tab = create_scrollable_tab(tabs, "Event")
-employee_tab = create_scrollable_tab(tabs, "Employee")
-vacation_tab = create_scrollable_tab(tabs, "Vacation")
+zoo_tab = create_scrollable_tab(tabs, "Zoodārzs")
+location_tab = create_scrollable_tab(tabs, "Vietas")
+petgroup_tab = create_scrollable_tab(tabs, "Dzīvnieku grupas")
+pet_tab = create_scrollable_tab(tabs, "Dzīvnieki")
+food_tab = create_scrollable_tab(tabs, "Barība")
+veterinary_tab = create_scrollable_tab(tabs, "Veterinārija")
+tickets_tab = create_scrollable_tab(tabs, "Biļetes")
+event_tab = create_scrollable_tab(tabs, "Pasākumi")
+employee_tab = create_scrollable_tab(tabs, "Darbinieki")
+vacation_tab = create_scrollable_tab(tabs, "Atvaļinājumi")
 
 # Piesaista ritināšanu Windows un Linux peles ritenīša notikumiem.
 vlog.bind_all("<MouseWheel>", scroll_current_tab)
 vlog.bind_all("<Button-4>", scroll_current_tab)
 vlog.bind_all("<Button-5>", scroll_current_tab)
 
-label = tk.Label(zoo_tab, text="ZOO", font=("Arial", 24))
-label.pack(pady=10)
 
-header = tk.Label(zoo_tab, text="Zoo base", font=("Arial", 30, "bold"))
-header.pack(pady=10)
 
 #ZOO pievienot
 zoo_block = tk.LabelFrame(
@@ -370,9 +420,8 @@ open_input.pack(pady=5)
 result = tk.Label(zoo_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(zoo_block, text="Pievienot", command=addzooFromvlog)
+product_button = make_action_button(zoo_block, "Pievienot", addzooFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 
 zoo_tree, zoo_form = make_search_table(
@@ -415,9 +464,8 @@ result.pack(pady=5)
 result = tk.Label(location_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(location_block, text="Pievienot", command=addlocationFromvlog)
+product_button = make_action_button(location_block, "Pievienot", addlocationFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 loc_tree, loc_form = make_search_table(
     location_tab, "Meklēt lokācijas:", ("ID", "Pet Name", "Zoo Name", "Ticket Name"),
@@ -448,9 +496,8 @@ amount_of_species_g_input.pack(pady=5)
 result = tk.Label(petgroup_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(petgroup_block, text="Pievienot", command=addpetgroupFromvlog)
+product_button = make_action_button(petgroup_block, "Pievienot", addpetgroupFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 pg_tree, pg_form = make_search_table(
     petgroup_tab, "Meklēt dzīvnieku grupas:", ("ID", "Pet Name", "Amount"),
@@ -489,9 +536,8 @@ feed_id_input.pack(pady=5)
 result = tk.Label(pet_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(pet_block, text="Pievienot", command=addpetFromvlog)
+product_button = make_action_button(pet_block, "Pievienot", addpetFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 pet_tree, pet_form = make_search_table(
     pet_tab, "Meklēt dzīvniekus:", ("ID", "Name", "Color", "Feed"),
@@ -537,9 +583,8 @@ next_order_input.pack(pady=5)
 result = tk.Label(food_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(food_block, text="Pievienot", command=addfoodFromvlog)
+product_button = make_action_button(food_block, "Pievienot", addfoodFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 food_tree, food_form = make_search_table(
     food_tab, "Meklēt pārtiku:", ("ID", "Product", "Price", "Stock", "Next Order"),
@@ -586,9 +631,8 @@ last_visit_input.pack(pady=5)
 result = tk.Label(veterinary_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(veterinary_block, text="Pievienot", command=addveterinaryrecordsFromvlog)
+product_button = make_action_button(veterinary_block, "Pievienot", addveterinaryrecordsFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 vet_tree, vet_form = make_search_table(
     veterinary_tab, "Meklēt veterināros ierakstus:", ("ID", "Pet Name", "Diagnosis", "Doctor Suggestion", "Last Visit"),
@@ -621,9 +665,8 @@ price_t_input.pack(pady=5)
 result = tk.Label(ticket_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(ticket_block, text="Pievienot", command=addticketsFromvlog)
+product_button = make_action_button(ticket_block, "Pievienot", addticketsFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 ticket_tree, ticket_form = make_search_table(
     tickets_tab, "Meklēt biļetes:", ("ID", "Name", "Price"),
@@ -677,9 +720,8 @@ ticket_id_e_input.pack(pady=5)
 result = tk.Label(event_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(event_block, text="Pievienot", command=addeventFromvlog)
+product_button = make_action_button(event_block, "Pievienot", addeventFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 event_tree, event_form = make_search_table(
     event_tab, "Meklēt pasākumus:", ("ID", "Name", "Start", "End", "Zoo", "Ticket"),
@@ -732,9 +774,8 @@ vacation_id_input.pack(pady=5)
 result = tk.Label(employee_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(employee_block, text="Pievienot", command=addemployeeFromvlog)
+product_button = make_action_button(employee_block, "Pievienot", addemployeeFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 emp_tree, emp_form = make_search_table(
     employee_tab, "Meklēt darbiniekus:", ("ID", "Name", "Surname", "Zoo"),
@@ -769,15 +810,15 @@ end_date_v_input.pack(pady=5)
 result = tk.Label(vacation_block, text="")
 result.pack(pady=5)
 
-product_button = tk.Button(vacation_block, text="Pievienot", command=addvacationFromvlog)
+product_button = make_action_button(vacation_block, "Pievienot", addvacationFromvlog)
 product_button.pack(pady=10)
-header.pack(pady = 20)
 
 vac_tree, vac_form = make_search_table(
     vacation_tab, "Meklēt atvaļinājumus:", ("ID", "Start", "End"),
     search_vacation, update_vacation, delete_vacation, "vacation"
 )
 vac_form["entries"] = [start_date_v_input, end_date_v_input]
+vlog.update_idletasks()
 
 #Vietne
 if __name__ == "__main__":
